@@ -1,3 +1,5 @@
+# Django models for advanced relationships
+
 from django.db import models
 
 class Author(models.Model):
