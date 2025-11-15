@@ -1,18 +1,10 @@
-\# RETRIEVE Operation
+# RETRIEVE Operation
 
-
-
-\## Command Used:
-
+## Command Used:
 ```python
-
 from bookshelf.models import Book
-
-book = Book.objects.first()
-
-book.title
-
-book.author  
-
-book.publication\_year
+book = Book.objects.get(title="1984")
+print(f"Title: {book.title}")
+print(f"Author: {book.author}")  
+print(f"Publication Year: {book.publication_year}")
 
