@@ -125,27 +125,32 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Custom user model
 AUTH_USER_MODEL = 'bookshelf.CustomUser'
-# Security settings for production
-# DEBUG = False  # Uncomment for production
-# ALLOWED_HOSTS = ['yourdomain.com', 'www.yourdomain.com']  # Set your domain for production
 
-# Security middleware settings
-SECURE_BROWSER_XSS_FILTER = True  # Enable browser XSS filter
+# HTTPS and Security Settings for Production
+# Note: For development, some settings are enabled but may require HTTPS setup
+
+# HTTPS Enforcement
+SECURE_SSL_REDIRECT = True  # Redirect all HTTP requests to HTTPS
+
+# Secure Cookies - Only sent over HTTPS
+CSRF_COOKIE_SECURE = True   # CSRF cookies only over HTTPS
+SESSION_COOKIE_SECURE = True  # Session cookies only over HTTPS
+
+# HTTP Strict Transport Security (HSTS)
+SECURE_HSTS_SECONDS = 31536000  # 1 year - Force browsers to use HTTPS
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True  # Apply to all subdomains
+SECURE_HSTS_PRELOAD = True  # Allow inclusion in HSTS preload lists
+
+# Security Headers
+SECURE_BROWSER_XSS_FILTER = True  # Enable browser XSS filtering
 X_FRAME_OPTIONS = 'DENY'  # Prevent clickjacking by denying frame embedding
 SECURE_CONTENT_TYPE_NOSNIFF = True  # Prevent MIME type sniffing
-
-# Cookie security (enable these in production with HTTPS)
-# CSRF_COOKIE_SECURE = True  # Send CSRF cookie over HTTPS only
-# SESSION_COOKIE_SECURE = True  # Send session cookie over HTTPS only
-
-# Content Security Policy (CSP) headers
-# Note: For full CSP implementation, install django-csp and add to middleware
 SECURE_REFERRER_POLICY = 'same-origin'  # Control Referer header
 
-# Additional security headers
-SECURE_HSTS_SECONDS = 31536000  # Enable HTTP Strict Transport Security (HSTS)
-SECURE_HSTS_INCLUDE_SUBDOMAINS = True  # Apply HSTS to subdomains
-SECURE_HSTS_PRELOAD = True  # Allow preloading of HSTS
-
-# SSL/HTTPS redirect (enable in production)
-# SECURE_SSL_REDIRECT = True  # Redirect all HTTP to HTTPS
+# Production Deployment Checklist:
+# 1. Set DEBUG = False
+# 2. Configure ALLOWED_HOSTS = ['yourdomain.com', 'www.yourdomain.com']
+# 3. Generate and configure SSL certificate on web server (Nginx/Apache)
+# 4. Update SECRET_KEY with environment variable
+# 5. Test all application functionality with HTTPS enabled
+# 6. Verify security headers using securityheaders.com
