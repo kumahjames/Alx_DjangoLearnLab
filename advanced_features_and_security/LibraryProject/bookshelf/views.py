@@ -46,6 +46,55 @@ def safe_book_detail(request, book_id):
 def validate_book_data(title, author, publication_year):
     """
     Custom validation function to ensure data integrity and security.
+   from django.shortcuts import render, get_object_or_404
+from django.contrib.auth.decorators import permission_required
+from django.db.models import Q
+from django.core.exceptions import ValidationError
+import re
+from .models import Book
+from .forms import ExampleForm  # Import the ExampleForm
+
+@permission_required('bookshelf.can_view', raise_exception=True)
+def book_list(request):
+    """
+    Secure book listing view with input validation and safe search functionality.
+    Uses Django ORM to prevent SQL injection and validates user input.
+    """
+    books = Book.objects.all()
+    
+    # Safe search functionality - uses Django ORM to prevent SQL injection
+    search_query = request.GET.get('search', '').strip()
+    
+    if search_query:
+        # Input validation: only allow alphanumeric characters and spaces
+        if not re.match(r'^[a-zA-Z0-9\s\-\.]+$', search_query):
+            # Log suspicious input (in production, you'd use proper logging)
+            print(f"Potential malicious input detected: {search_query}")
+            search_query = ''  # Reset to safe value
+        else:
+            # Safe ORM query using parameterized queries (no string formatting)
+            books = books.filter(
+                Q(title__icontains=search_query) | 
+                Q(author__icontains=search_query)
+            )
+    
+    return render(request, 'bookshelf/book_list.html', {
+        'books': books,
+        'search_query': search_query
+    })
+
+def safe_book_detail(request, book_id):
+    """
+    Secure book detail view using get_object_or_404 to prevent information leakage.
+    """
+    # Safe object retrieval - prevents exposing existence of objects
+    book = get_object_or_404(Book, id=book_id)
+    
+    return render(request, 'bookshelf/book_detail.html', {'book': book})
+
+def validate_book_data(title, author, publication_year):
+    """
+    Custom validation function to ensure data integrity and security.
     """
     errors = []
     
@@ -68,3 +117,27 @@ def validate_book_data(title, author, publication_year):
         errors.append("Publication year must be a valid number")
     
     return errors
+
+def form_example_view(request):
+    """
+    Example view demonstrating secure form handling with Django forms.
+    """
+    if request.method == 'POST':
+        form = ExampleForm(request.POST)
+        if form.is_valid():
+            # Process secure form data
+            title = form.cleaned_data['title']
+            author = form.cleaned_data['author']
+            publication_year = form.cleaned_data['publication_year']
+            
+            # Security: All data has been validated and cleaned
+            # In a real application, you would save to database here
+            return render(request, 'bookshelf/form_success.html', {
+                'title': title,
+                'author': author,
+                'publication_year': publication_year
+            })
+    else:
+        form = ExampleForm()
+    
+    return render(request, 'bookshelf/form_example.html', {'form': form})
