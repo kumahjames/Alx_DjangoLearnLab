@@ -132,6 +132,9 @@ AUTH_USER_MODEL = 'bookshelf.CustomUser'
 # HTTPS Enforcement
 SECURE_SSL_REDIRECT = True  # Redirect all HTTP requests to HTTPS
 
+# Proxy SSL Header (for reverse proxy setups)
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
 # Secure Cookies - Only sent over HTTPS
 CSRF_COOKIE_SECURE = True   # CSRF cookies only over HTTPS
 SESSION_COOKIE_SECURE = True  # Session cookies only over HTTPS
