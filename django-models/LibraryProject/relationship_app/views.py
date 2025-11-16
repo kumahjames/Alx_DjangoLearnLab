@@ -1,12 +1,10 @@
 from django.shortcuts import render
-
-# Create your views here.
-from django.shortcuts import render
 from django.views.generic import ListView, DetailView
-from .models import Book, Library
+from .models import Library
 
 # Function-based view to list all books
 def list_books(request):
+    from .models import Book
     books = Book.objects.all()
     return render(request, 'relationship_app/list_books.html', {'books': books})
 
