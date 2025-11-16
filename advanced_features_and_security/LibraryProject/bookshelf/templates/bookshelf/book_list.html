@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'">
+    <title>Book List</title>
+</head>
+<body>
+    <h1>Books Available:</h1>
+    
+    <!-- Search form with CSRF protection -->
+    <form method="get" action="">
+        {% csrf_token %}  <!-- CSRF protection even for GET requests as best practice -->
+        <input type="text" name="search" placeholder="Search books..." 
+               value="{{ request.GET.search|default:'' }}">
+        <button type="submit">Search</button>
+        <!-- Note: User input is safely escaped by Django template system -->
+    </form>
+
+    <ul>
+        {% for book in books %}
+        <li>
+            <strong>{{ book.title }}</strong> by {{ book.author }} 
+            ({{ book.publication_year }})
+            <!-- Django auto-escapes variables to prevent XSS attacks -->
+        </li>
+        {% empty %}
+        <li>No books found.</li>
+        {% endfor %}
+    </ul>
+
+    <!-- Security Features Implemented:
+    1. CSRF token protection
+    2. Content Security Policy header
+    3. Automatic HTML escaping by Django
+    4. Safe handling of user input in search -->
+</body>
+</html>

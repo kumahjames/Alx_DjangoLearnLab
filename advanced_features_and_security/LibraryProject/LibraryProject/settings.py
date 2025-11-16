@@ -125,3 +125,27 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Custom user model
 AUTH_USER_MODEL = 'bookshelf.CustomUser'
+# Security settings for production
+# DEBUG = False  # Uncomment for production
+# ALLOWED_HOSTS = ['yourdomain.com', 'www.yourdomain.com']  # Set your domain for production
+
+# Security middleware settings
+SECURE_BROWSER_XSS_FILTER = True  # Enable browser XSS filter
+X_FRAME_OPTIONS = 'DENY'  # Prevent clickjacking by denying frame embedding
+SECURE_CONTENT_TYPE_NOSNIFF = True  # Prevent MIME type sniffing
+
+# Cookie security (enable these in production with HTTPS)
+# CSRF_COOKIE_SECURE = True  # Send CSRF cookie over HTTPS only
+# SESSION_COOKIE_SECURE = True  # Send session cookie over HTTPS only
+
+# Content Security Policy (CSP) headers
+# Note: For full CSP implementation, install django-csp and add to middleware
+SECURE_REFERRER_POLICY = 'same-origin'  # Control Referer header
+
+# Additional security headers
+SECURE_HSTS_SECONDS = 31536000  # Enable HTTP Strict Transport Security (HSTS)
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True  # Apply HSTS to subdomains
+SECURE_HSTS_PRELOAD = True  # Allow preloading of HSTS
+
+# SSL/HTTPS redirect (enable in production)
+# SECURE_SSL_REDIRECT = True  # Redirect all HTTP to HTTPS

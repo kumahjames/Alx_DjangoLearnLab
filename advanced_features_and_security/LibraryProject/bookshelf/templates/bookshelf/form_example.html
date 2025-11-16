@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secure Book Form</title>
+</head>
+<body>
+    <h1>Add a New Book</h1>
+    
+    <!-- Secure form with CSRF protection -->
+    <form method="post">
+        {% csrf_token %}  <!-- CSRF token for protection against cross-site request forgery -->
+        
+        <div>
+            <label for="title">Book Title:</label>
+            <input type="text" id="title" name="title" maxlength="200" required>
+            <!-- maxlength attribute prevents buffer overflow attacks -->
+        </div>
+        
+        <div>
+            <label for="author">Author:</label>
+            <input type="text" id="author" name="author" maxlength="100" required>
+        </div>
+        
+        <div>
+            <label for="publication_year">Publication Year:</label>
+            <input type="number" id="publication_year" name="publication_year" 
+                   min="1000" max="2024" required>
+            <!-- Input validation with min/max prevents invalid data -->
+        </div>
+        
+        <button type="submit">Add Book</button>
+    </form>
+
+    <!-- Security note: This form includes CSRF protection and input validation -->
+    <!-- to prevent common web vulnerabilities like CSRF attacks and XSS -->
+</body>
+</html>
