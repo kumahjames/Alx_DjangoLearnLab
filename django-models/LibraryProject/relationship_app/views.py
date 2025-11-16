@@ -7,7 +7,7 @@ from django.views.generic.detail import DetailView
 from .models import Library
 
 # Authentication Views
-def register_view(request):
+def register(request):
     """User registration view"""
     if request.method == 'POST':
         form = UserCreationForm(request.POST)
