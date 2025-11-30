@@ -3,19 +3,19 @@ from django.db import models
 # Create your models here.
 from django.db import models
 
-# Author model to store author information
+# Author model representing book authors
 class Author(models.Model):
-    # Name field to store the author's name
+    # Author's name field
     name = models.CharField(max_length=100)
     
     def __str__(self):
         return self.name
 
-# Book model to store book information with relationship to Author
+# Book model representing books with author relationship
 class Book(models.Model):
-    # Title field for the book's title
+    # Book title field
     title = models.CharField(max_length=200)
-    # Publication year field
+    # Year the book was published
     publication_year = models.IntegerField()
     # Foreign key relationship to Author (one author can have many books)
     author = models.ForeignKey(Author, on_delete=models.CASCADE, related_name='books')
