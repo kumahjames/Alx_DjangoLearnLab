@@ -71,7 +71,8 @@ class BookAPITestCase(TestCase):
         """
         Test creating a book as authenticated user.
         """
-        self.client.force_authenticate(user=self.regular_user)
+        # Explicit login using self.client.login
+        self.client.login(username='testuser', password='testpass123')
         data = {
             'title': 'New Test Book',
             'publication_year': 2020,
@@ -80,6 +81,8 @@ class BookAPITestCase(TestCase):
         response = self.client.post('/api/books/create/', data)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(response.data['book']['title'], 'New Test Book')
+        # Explicit logout
+        self.client.logout()
     
     def test_create_book_unauthenticated(self):
         """
@@ -191,3 +194,23 @@ class BookAPITestCase(TestCase):
         }
         response = self.client.post('/api/books/create/', data)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+    
+    def test_explicit_login_logout(self):
+        """
+        Test explicit login and logout functionality for session management.
+        """
+        # Test login
+        login_success = self.client.login(username='testuser', password='testpass123')
+        self.assertTrue(login_success)
+        
+        # Test authenticated action
+        response = self.client.get('/api/books/')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        
+        # Test logout
+        self.client.logout()
+        
+        # Verify logout worked by testing unauthorized access
+        data = {'title': 'Test Book', 'publication_year': 2020, 'author': self.author1.id}
+        response = self.client.post('/api/books/create/', data)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
