@@ -128,3 +128,41 @@ The API can be tested using:
 
 \- SQLite database (default)
 
+
+## Advanced Query Features
+
+### Filtering, Searching, and Ordering
+
+The BookListView now supports advanced query capabilities:
+
+#### Filtering
+Filter books by specific fields using query parameters:
+- `?title=Harry Potter` - Filter by exact title
+- `?publication_year=1997` - Filter by publication year
+- `?author__name=J.K. Rowling` - Filter by author name
+
+#### Searching
+Perform text searches across multiple fields:
+- `?search=harry` - Search in title and author name fields
+- `?search=rowling` - Search for author names
+
+#### Ordering
+Sort results by various fields:
+- `?ordering=title` - Sort by title (ascending)
+- `?ordering=-publication_year` - Sort by publication year (descending)
+- `?ordering=title,-publication_year` - Multiple field sorting
+
+### Example API Requests
+
+```http
+# Get all books published in 1997
+GET /api/books/?publication_year=1997
+
+# Search for books with "Harry" in title or author name
+GET /api/books/?search=harry
+
+# Get books sorted by publication year (newest first)
+GET /api/books/?ordering=-publication_year
+
+# Combined: Search and filter
+GET /api/books/?search=potter&publication_year=1997&ordering=title
