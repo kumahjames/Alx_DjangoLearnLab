@@ -1,8 +1,9 @@
 from rest_framework import generics, permissions, status
 from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated 
 from .models import Book, Author
 from .serializers import BookSerializer, AuthorSerializer
-from .permissions import IsOwnerOrReadOnly, IsStaffUser  # Add this import
+from .permissions import IsOwnerOrReadOnly, IsStaffUser
 
 # List all books - accessible to everyone
 class BookListView(generics.ListAPIView):
