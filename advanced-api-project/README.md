@@ -166,3 +166,26 @@ GET /api/books/?ordering=-publication_year
 
 # Combined: Search and filter
 GET /api/books/?search=potter&publication_year=1997&ordering=title
+
+## Testing Strategy
+
+### Test Coverage
+The test suite comprehensively covers:
+- **CRUD Operations**: Create, Read, Update, Delete functionality
+- **Authentication & Permissions**: User access control testing
+- **Filtering, Searching, Ordering**: Query parameter functionality
+- **Validation**: Data integrity and business rule validation
+
+### Running Tests
+```bash
+# Run all tests for the api app
+python manage.py test api
+
+# Run with verbose output
+python manage.py test api -v 2
+
+# Run specific test case
+python manage.py test api.tests.BookAPITestCase
+
+# Run specific test method
+python manage.py test api.tests.BookAPITestCase.test_list_books
