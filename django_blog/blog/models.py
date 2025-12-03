@@ -1,8 +1,6 @@
 from django.db import models
-
-# Create your models here.
-from django.db import models
 from django.contrib.auth.models import User
+from django.urls import reverse  
 
 # Post model for the blog application
 class Post(models.Model):
@@ -13,3 +11,8 @@ class Post(models.Model):
     
     def __str__(self):
         return self.title
+    
+    # Add this method for redirect after creation
+    def get_absolute_url(self):
+        return reverse('post-detail', kwargs={'pk': self.pk})
+

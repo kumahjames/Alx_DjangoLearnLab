@@ -1,0 +1,36 @@
+{% extends 'blog/base.html' %}
+
+{% block title %}{{ post.title }} - Django Blog{% endblock %}
+
+{% block content %}
+    <div style="max-width: 800px; margin: 0 auto;">
+        <h1>{{ post.title }}</h1>
+        
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 1px solid #eee;">
+            <div>
+                <small>
+                    By <strong>{{ post.author.username }}</strong> on {{ post.published_date|date:"F d, Y H:i" }}
+                </small>
+            </div>
+            
+            {% if user == post.author %}
+                <div>
+                    <a href="{% url 'post-update' post.id %}" style="color: #17a2b8; margin-right: 15px; padding: 5px 10px; border: 1px solid #17a2b8; border-radius: 3px; text-decoration: none;">
+                        Edit Post
+                    </a>
+                    <a href="{% url 'post-delete' post.id %}" style="color: #dc3545; padding: 5px 10px; border: 1px solid #dc3545; border-radius: 3px; text-decoration: none;">
+                        Delete Post
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+        
+        <div style="line-height: 1.6; font-size: 16px;">
+            {{ post.content|linebreaks }}
+        </div>
+        
+        <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee;">
+            <a href="{% url 'post-list' %}" style="color: #007bff; text-decoration: none;">← Back to All Posts</a>
+        </div>
+    </div>
+{% endblock %}

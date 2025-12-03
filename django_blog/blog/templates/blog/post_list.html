@@ -1,0 +1,55 @@
+{% extends 'blog/base.html' %}
+
+{% block title %}All Posts - Django Blog{% endblock %}
+
+{% block content %}
+    <h1>All Blog Posts</h1>
+    
+    {% if user.is_authenticated %}
+        <a href="{% url 'post-create' %}" style="display: inline-block; margin-bottom: 20px; padding: 10px 15px; background-color: #007bff; color: white; text-decoration: none; border-radius: 5px;">
+            + Create New Post
+        </a>
+    {% endif %}
+    
+    {% for post in posts %}
+        <div style="border: 1px solid #ddd; padding: 20px; margin: 15px 0; border-radius: 5px; background-color: white;">
+            <h2><a href="{% url 'post-detail' post.id %}" style="color: #333; text-decoration: none;">{{ post.title }}</a></h2>
+            <p>{{ post.content|truncatewords:100 }}</p>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px;">
+                <small>
+                    By <strong>{{ post.author.username }}</strong> on {{ post.published_date|date:"F d, Y" }}
+                </small>
+                {% if user == post.author %}
+                    <div>
+                        <a href="{% url 'post-update' post.id %}" style="color: #17a2b8; margin-right: 10px;">Edit</a>
+                        <a href="{% url 'post-delete' post.id %}" style="color: #dc3545;">Delete</a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    {% empty %}
+        <p>No posts yet. Be the first to create one!</p>
+    {% endfor %}
+    
+    {% if is_paginated %}
+        <div style="margin-top: 20px; text-align: center;">
+            {% if page_obj.has_previous %}
+                <a href="?page=1" style="margin-right: 10px;">First</a>
+                <a href="?page={{ page_obj.previous_page_number }}" style="margin-right: 10px;">Previous</a>
+            {% endif %}
+            
+            {% for num in page_obj.paginator.page_range %}
+                {% if page_obj.number == num %}
+                    <strong style="margin: 0 5px;">{{ num }}</strong>
+                {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                    <a href="?page={{ num }}" style="margin: 0 5px;">{{ num }}</a>
+                {% endif %}
+            {% endfor %}
+            
+            {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}" style="margin-left: 10px;">Next</a>
+                <a href="?page={{ page_obj.paginator.num_pages }}" style="margin-left: 10px;">Last</a>
+            {% endif %}
+        </div>
+    {% endif %}
+{% endblock %}
