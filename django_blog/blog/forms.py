@@ -35,3 +35,18 @@ class PostForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         self.fields['title'].widget.attrs.update({'placeholder': 'Enter post title'})
         self.fields['content'].widget.attrs.update({'placeholder': 'Write your post content here...'})
+
+from .models import Comment
+
+# Form for creating and updating comments
+class CommentForm(forms.ModelForm):
+    class Meta:
+        model = Comment
+        fields = ['content']
+        
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['content'].widget.attrs.update({
+            'placeholder': 'Write your comment here...',
+            'rows': 3
+        })

@@ -1,11 +1,12 @@
+from .forms import CommentForm, UserRegistrationForm, UserUpdateForm, PostForm
+from .models import Comment, Post
+from django.urls import reverse_lazy
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib import messages
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
-from .forms import UserRegistrationForm, UserUpdateForm, PostForm
-from .models import Post
 from django.contrib.auth.models import User
 
 # Home page view (using function-based view)
@@ -76,10 +77,16 @@ class PostListView(ListView):
     ordering = ['-published_date']
     paginate_by = 5
 
-# View single post detail
+# View single post detail WITH COMMENTS
 class PostDetailView(DetailView):
     model = Post
     template_name = 'blog/post_detail.html'
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['comments'] = self.object.comments.all().order_by('-created_at')
+        context['comment_form'] = CommentForm()
+        return context
 
 # Create new post (only for authenticated users)
 class PostCreateView(LoginRequiredMixin, CreateView):
@@ -119,3 +126,57 @@ class PostDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     def delete(self, request, *args, **kwargs):
         messages.success(request, 'Your post has been deleted!')
         return super().delete(request, *args, **kwargs)
+
+# Comment views
+
+# Create comment
+@login_required
+def add_comment(request, pk):
+    post = get_object_or_404(Post, pk=pk)
+    if request.method == 'POST':
+        form = CommentForm(request.POST)
+        if form.is_valid():
+            comment = form.save(commit=False)
+            comment.post = post
+            comment.author = request.user
+            comment.save()
+            messages.success(request, 'Your comment has been added!')
+            return redirect('post-detail', pk=post.pk)
+    
+    return redirect('post-detail', pk=post.pk)
+
+# Update comment
+@login_required
+def update_comment(request, pk):
+    comment = get_object_or_404(Comment, pk=pk)
+    
+    # Check if user is the author of the comment
+    if comment.author != request.user:
+        messages.error(request, 'You are not authorized to edit this comment!')
+        return redirect('post-detail', pk=comment.post.pk)
+    
+    if request.method == 'POST':
+        form = CommentForm(request.POST, instance=comment)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Your comment has been updated!')
+            return redirect('post-detail', pk=comment.post.pk)
+    else:
+        form = CommentForm(instance=comment)
+    
+    return render(request, 'blog/comment_form.html', {'form': form, 'comment': comment})
+
+# Delete comment
+@login_required
+def delete_comment(request, pk):
+    comment = get_object_or_404(Comment, pk=pk)
+    
+    # Check if user is the author of the comment
+    if comment.author != request.user:
+        messages.error(request, 'You are not authorized to delete this comment!')
+        return redirect('post-detail', pk=comment.post.pk)
+    
+    post_pk = comment.post.pk
+    comment.delete()
+    messages.success(request, 'Your comment has been deleted!')
+    return redirect('post-detail', pk=post_pk)

@@ -1,0 +1,24 @@
+{% extends 'blog/base.html' %}
+
+{% block title %}Edit Comment - Django Blog{% endblock %}
+
+{% block content %}
+    <div style="max-width: 600px; margin: 0 auto;">
+        <h2>Edit Comment</h2>
+        
+        <form method="post">
+            {% csrf_token %}
+            <div style="margin-bottom: 15px;">
+                {{ form.content }}
+            </div>
+            <div style="display: flex; gap: 10px;">
+                <button type="submit" style="background-color: #007bff; color: white; padding: 8px 16px; border: none; border-radius: 3px; cursor: pointer;">
+                    Update Comment
+                </button>
+                <a href="{% url 'post-detail' comment.post.id %}" style="background-color: #6c757d; color: white; padding: 8px 16px; border: none; border-radius: 3px; text-decoration: none; display: inline-block;">
+                    Cancel
+                </a>
+            </div>
+        </form>
+    </div>
+{% endblock %}
