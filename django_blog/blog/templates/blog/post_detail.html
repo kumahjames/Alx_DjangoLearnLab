@@ -45,10 +45,10 @@
                     <!-- Comment actions (only for comment author) -->
                     {% if user == comment.author %}
                         <div style="margin-top: 10px;">
-                            <a href="{% url 'update-comment' comment.id %}" style="color: #17a2b8; margin-right: 10px; font-size: 14px; text-decoration: none;">
+                            <a href="{% url 'comment-update' comment.id %}" style="color: #17a2b8; margin-right: 10px; font-size: 14px; text-decoration: none;">
                                 Edit
                             </a>
-                            <a href="{% url 'delete-comment' comment.id %}" style="color: #dc3545; font-size: 14px; text-decoration: none;">
+                            <a href="{% url 'comment-delete' comment.id %}" style="color: #dc3545; font-size: 14px; text-decoration: none;">
                                 Delete
                             </a>
                         </div>
@@ -62,7 +62,7 @@
             {% if user.is_authenticated %}
                 <div style="margin-top: 30px;">
                     <h4>Add a Comment</h4>
-                    <form method="post" action="{% url 'add-comment' post.id %}">
+                    <form method="post" action="{% url 'comment-create' post.id %}">
                         {% csrf_token %}
                         <div style="margin-bottom: 15px;">
                             {{ comment_form.content }}

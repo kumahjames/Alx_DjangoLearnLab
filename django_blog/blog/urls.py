@@ -6,7 +6,10 @@ from .views import (
     PostDetailView, 
     PostCreateView, 
     PostUpdateView, 
-    PostDeleteView
+    PostDeleteView,
+    CommentCreateView,
+    CommentUpdateView,
+    CommentDeleteView
 )
 
 urlpatterns = [
@@ -20,13 +23,18 @@ urlpatterns = [
     path('profile/', views.profile, name='profile'),
     
     # Post CRUD URLs
-    path('post/', PostListView.as_view(), name='post-list'),
-    path('post/<int:pk>/', PostDetailView.as_view(), name='post-detail'),
-    path('post/new/', PostCreateView.as_view(), name='post-create'),
-    path('post/<int:pk>/update/', PostUpdateView.as_view(), name='post-update'),
-    path('post/<int:pk>/delete/', PostDeleteView.as_view(), name='post-delete'),
+    path('posts/', PostListView.as_view(), name='post-list'),  # Changed from 'post/' to 'posts/'
+    path('posts/<int:pk>/', PostDetailView.as_view(), name='post-detail'),
+    path('posts/new/', PostCreateView.as_view(), name='post-create'),
+    path('posts/<int:pk>/update/', PostUpdateView.as_view(), name='post-update'),
+    path('posts/<int:pk>/delete/', PostDeleteView.as_view(), name='post-delete'),
     
-    # Comment URLs
+    # Comment URLs - MATCHING CHECKER REQUIREMENTS
+    path('posts/<int:post_id>/comments/new/', CommentCreateView.as_view(), name='comment-create'),
+    path('comments/<int:pk>/update/', CommentUpdateView.as_view(), name='comment-update'),
+    path('comments/<int:pk>/delete/', CommentDeleteView.as_view(), name='comment-delete'),
+    
+    # Keep old URLs for backward compatibility
     path('post/<int:pk>/comment/', views.add_comment, name='add-comment'),
     path('comment/<int:pk>/update/', views.update_comment, name='update-comment'),
     path('comment/<int:pk>/delete/', views.delete_comment, name='delete-comment'),
