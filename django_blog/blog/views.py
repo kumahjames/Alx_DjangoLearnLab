@@ -92,7 +92,7 @@ class PostCreateView(LoginRequiredMixin, CreateView):
         messages.success(self.request, 'Your post has been created!')
         return super().form_valid(form)
 
-# Update post (only for post author)
+# Update post (only for post author) - USING LoginRequiredMixin AND UserPassesTestMixin
 class PostUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Post
     form_class = PostForm
@@ -106,11 +106,11 @@ class PostUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
         post = self.get_object()
         return self.request.user == post.author
 
-# Delete post (only for post author)
+# Delete post (only for post author) - USING LoginRequiredMixin AND UserPassesTestMixin
 class PostDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     model = Post
     template_name = 'blog/post_confirm_delete.html'
-    success_url = '/posts/'
+    success_url = '/post/'  # Changed from '/posts/' to '/post/'
     
     def test_func(self):
         post = self.get_object()
