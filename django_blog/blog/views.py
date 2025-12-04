@@ -117,7 +117,7 @@ class PostUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
 class PostDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     model = Post
     template_name = 'blog/post_confirm_delete.html'
-    success_url = '/post/'  # Changed from '/posts/' to '/post/'
+    success_url = '/post/'
     
     def test_func(self):
         post = self.get_object()
@@ -136,14 +136,14 @@ class CommentCreateView(LoginRequiredMixin, CreateView):
     template_name = 'blog/comment_form.html'
     
     def form_valid(self, form):
-        post = get_object_or_404(Post, pk=self.kwargs['post_id'])
+        post = get_object_or_404(Post, pk=self.kwargs['pk'])
         form.instance.post = post
         form.instance.author = self.request.user
         messages.success(self.request, 'Your comment has been added!')
         return super().form_valid(form)
     
     def get_success_url(self):
-        return reverse_lazy('post-detail', kwargs={'pk': self.kwargs['post_id']})
+        return reverse_lazy('post-detail', kwargs={'pk': self.kwargs['pk']})
 
 # Update comment - CLASS BASED VIEW
 class CommentUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
