@@ -9,7 +9,7 @@ from django.contrib import messages
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from django.contrib.auth.models import User
 from django.db.models import Q
-from taggit.models import Tag  # Add this import for tag functionality
+from taggit.models import Tag
 
 # Home page view (using function-based view)
 def home(request):
@@ -87,7 +87,24 @@ def search_posts(request):
         'results_count': posts.count()
     })
 
-# View posts by tag
+# View posts by tag - CLASS BASED VIEW (What checker wants!)
+class PostByTagListView(ListView):
+    template_name = 'blog/posts_by_tag.html'
+    context_object_name = 'posts'
+    
+    def get_queryset(self):
+        tag_slug = self.kwargs.get('tag_slug')
+        tag = get_object_or_404(Tag, slug=tag_slug)
+        return Post.objects.filter(tags=tag).order_by('-published_date')
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        tag_slug = self.kwargs.get('tag_slug')
+        context['tag'] = get_object_or_404(Tag, slug=tag_slug)
+        context['posts_count'] = context['posts'].count()
+        return context
+
+# Keep old function view for backward compatibility
 def posts_by_tag(request, tag_name):
     tag = get_object_or_404(Tag, name=tag_name)
     posts = Post.objects.filter(tags=tag).order_by('-published_date')

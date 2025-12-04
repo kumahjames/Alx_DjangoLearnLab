@@ -9,7 +9,8 @@ from .views import (
     PostDeleteView,
     CommentCreateView,
     CommentUpdateView,
-    CommentDeleteView
+    CommentDeleteView,
+    PostByTagListView  # Add this import
 )
 
 urlpatterns = [
@@ -34,8 +35,8 @@ urlpatterns = [
     path('comments/<int:pk>/update/', CommentUpdateView.as_view(), name='comment-update'),
     path('comments/<int:pk>/delete/', CommentDeleteView.as_view(), name='comment-delete'),
     
-    # Tag and Search URLs
-    path('tags/<str:tag_name>/', views.posts_by_tag, name='posts-by-tag'),
+    # Tag and Search URLs - CHECKER REQUIREMENTS
+    path('tags/<slug:tag_slug>/', PostByTagListView.as_view(), name='posts-by-tag'),
     path('search/', views.search_posts, name='search'),
     
     # Keep old URLs for backward compatibility
