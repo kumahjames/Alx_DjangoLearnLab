@@ -34,6 +34,10 @@ urlpatterns = [
     path('comments/<int:pk>/update/', CommentUpdateView.as_view(), name='comment-update'),
     path('comments/<int:pk>/delete/', CommentDeleteView.as_view(), name='comment-delete'),
     
+    # Tag and Search URLs
+    path('tags/<str:tag_name>/', views.posts_by_tag, name='posts-by-tag'),
+    path('search/', views.search_posts, name='search'),
+    
     # Keep old URLs for backward compatibility
     path('post/<int:pk>/comment/', views.add_comment, name='add-comment'),
     path('comment/<int:pk>/update/', views.update_comment, name='update-comment'),

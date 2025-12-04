@@ -8,6 +8,8 @@ from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib import messages
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from django.contrib.auth.models import User
+from django.db.models import Q
+from taggit.models import Tag  # Add this import for tag functionality
 
 # Home page view (using function-based view)
 def home(request):
@@ -67,6 +69,35 @@ def profile(request):
         'user_posts': user_posts
     })
 
+# Search functionality
+def search_posts(request):
+    query = request.GET.get('q', '')
+    posts = Post.objects.all()
+    
+    if query:
+        posts = posts.filter(
+            Q(title__icontains=query) |
+            Q(content__icontains=query) |
+            Q(tags__name__icontains=query)
+        ).distinct().order_by('-published_date')
+    
+    return render(request, 'blog/search_results.html', {
+        'posts': posts,
+        'query': query,
+        'results_count': posts.count()
+    })
+
+# View posts by tag
+def posts_by_tag(request, tag_name):
+    tag = get_object_or_404(Tag, name=tag_name)
+    posts = Post.objects.filter(tags=tag).order_by('-published_date')
+    
+    return render(request, 'blog/posts_by_tag.html', {
+        'tag': tag,
+        'posts': posts,
+        'posts_count': posts.count()
+    })
+
 # Class-based views for Post CRUD operations
 
 # List all posts
@@ -88,7 +119,7 @@ class PostDetailView(DetailView):
         context['comment_form'] = CommentForm()
         return context
 
-# Create new post (only for authenticated users)
+# Create new post with tags (only for authenticated users)
 class PostCreateView(LoginRequiredMixin, CreateView):
     model = Post
     form_class = PostForm
@@ -96,18 +127,28 @@ class PostCreateView(LoginRequiredMixin, CreateView):
     
     def form_valid(self, form):
         form.instance.author = self.request.user
+        response = super().form_valid(form)
+        # Save tags
+        tags = form.cleaned_data['tags']
+        if tags:
+            form.instance.tags.set(*[tag.strip() for tag in tags.split(',') if tag.strip()])
         messages.success(self.request, 'Your post has been created!')
-        return super().form_valid(form)
+        return response
 
-# Update post (only for post author) - USING LoginRequiredMixin AND UserPassesTestMixin
+# Update post with tags (only for post author)
 class PostUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Post
     form_class = PostForm
     template_name = 'blog/post_form.html'
     
     def form_valid(self, form):
+        response = super().form_valid(form)
+        # Save tags
+        tags = form.cleaned_data['tags']
+        if tags:
+            form.instance.tags.set(*[tag.strip() for tag in tags.split(',') if tag.strip()])
         messages.success(self.request, 'Your post has been updated!')
-        return super().form_valid(form)
+        return response
     
     def test_func(self):
         post = self.get_object()
