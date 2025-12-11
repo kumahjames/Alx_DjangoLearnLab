@@ -1,3 +1,10 @@
+from django.shortcuts import get_object_or_404
+from rest_framework.decorators import action
+from rest_framework.response import Response
+from rest_framework import status
+from .models import Like
+from .serializers import LikeSerializer
+from notifications.models import Notification
 from rest_framework import viewsets, filters, status
 from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
@@ -17,6 +24,56 @@ from django.contrib.auth import get_user_model
 User = get_user_model()
 
 class PostViewSet(viewsets.ModelViewSet):
+    @action(detail=True, methods=['post'])
+    def like(self, request, pk=None):
+        post = self.get_object()
+        user = request.user
+        
+        if not user.is_authenticated:
+            return Response({'error': 'Authentication required'}, status=status.HTTP_401_UNAUTHORIZED)
+        
+        # Check if already liked
+        if Like.objects.filter(user=user, post=post).exists():
+            return Response({'error': 'Post already liked'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Create like
+        like = Like.objects.create(user=user, post=post)
+        
+        # Create notification if user is not liking their own post
+        if user != post.author:
+            Notification.objects.create(
+                recipient=post.author,
+                actor=user,
+                verb='liked your post',
+                target=post
+            )
+        
+        serializer = LikeSerializer(like)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+    
+    @action(detail=True, methods=['post'])
+    def unlike(self, request, pk=None):
+        post = self.get_object()
+        user = request.user
+        
+        if not user.is_authenticated:
+            return Response({'error': 'Authentication required'}, status=status.HTTP_401_UNAUTHORIZED)
+        
+        # Check if liked
+        like = Like.objects.filter(user=user, post=post).first()
+        if not like:
+            return Response({'error': 'Post not liked'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        like.delete()
+        return Response({'message': 'Post unliked successfully'}, status=status.HTTP_200_OK)
+    
+    @action(detail=True, methods=['get'])
+    def likes(self, request, pk=None):
+        post = self.get_object()
+        likes = Like.objects.filter(post=post)
+        serializer = LikeSerializer(likes, many=True)
+        return Response(serializer.data)
+
     """
     ViewSet for viewing and editing posts.
     """
