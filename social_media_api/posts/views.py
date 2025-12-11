@@ -24,9 +24,12 @@ from django.contrib.auth import get_user_model
 User = get_user_model()
 
 class PostViewSet(viewsets.ModelViewSet):
-    @action(detail=True, methods=['post'])
+        @action(detail=True, methods=['post'])
     def like(self, request, pk=None):
-        post = self.get_object()
+        from django.shortcuts import get_object_or_404
+        from .models import Post
+        
+        post = get_object_or_404(Post, pk=pk)
         user = request.user
         
         if not user.is_authenticated:
@@ -50,7 +53,6 @@ class PostViewSet(viewsets.ModelViewSet):
         
         serializer = LikeSerializer(like)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
-    
     @action(detail=True, methods=['post'])
     def unlike(self, request, pk=None):
         post = self.get_object()
