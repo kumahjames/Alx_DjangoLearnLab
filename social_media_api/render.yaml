@@ -1,0 +1,24 @@
+services:
+  - type: web
+    name: social-media-api
+    env: python
+    plan: free
+    buildCommand: "pip install -r requirements.txt && python manage.py collectstatic --noinput"
+    startCommand: "gunicorn social_media_api.wsgi"
+    envVars:
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DEBUG
+        value: "False"
+      - key: DATABASE_URL
+        fromDatabase:
+          name: social-media-db
+          property: connectionString
+    healthCheckPath: /api/posts/
+    autoDeploy: true
+
+databases:
+  - name: social-media-db
+    plan: free
+    databaseName: social_media_db
+    user: social_media_user
