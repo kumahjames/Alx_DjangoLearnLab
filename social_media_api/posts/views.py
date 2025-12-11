@@ -1,4 +1,4 @@
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404 as generics_get_object_or_404
 from rest_framework import viewsets, filters, status, permissions
 from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.response import Response
