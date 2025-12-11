@@ -12,6 +12,7 @@ from .serializers import (
 )
 from django.contrib.auth import get_user_model
 
+# Feed endpoint: returns posts from followed users
 User = get_user_model()
 
 class PostViewSet(viewsets.ModelViewSet):

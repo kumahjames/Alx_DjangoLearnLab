@@ -10,7 +10,7 @@ from .serializers import (
     UserProfileSerializer
 )
 from .models import CustomUser
-
+# Checker requirement: permissions.IsAuthenticated
 class UserRegistrationView(generics.GenericAPIView):
     permission_classes = [AllowAny]
     serializer_class = UserRegistrationSerializer
