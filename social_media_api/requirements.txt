@@ -11,3 +11,5 @@ python-decouple==3.8
 Pillow==10.1.0
 django-extensions==3.2.3
 drf-yasg==1.21.7dj-database-url==2.0.0 
+boto3==1.34.0 
+django-storages==1.14.0 
