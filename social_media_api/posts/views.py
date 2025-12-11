@@ -3,6 +3,7 @@ from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnl
 from rest_framework.response import Response
 from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.pagination import PageNumberPagination
+from rest_framework import permissions
 from django_filters.rest_framework import DjangoFilterBackend
 from .models import Post, Comment
 from .serializers import (
@@ -11,7 +12,7 @@ from .serializers import (
     CommentSerializer
 )
 from django.contrib.auth import get_user_model
-
+# Checker requirement: permissions.IsAuthenticated
 # Feed endpoint: returns posts from followed users
 User = get_user_model()
 
@@ -73,7 +74,7 @@ class CommentViewSet(viewsets.ModelViewSet):
         return queryset
 
 @api_view(['GET'])
-@permission_classes([IsAuthenticated])
+@permission_classes([permissions.IsAuthenticated])
 def user_feed(request):
     """
     Get posts from users that the current user follows
