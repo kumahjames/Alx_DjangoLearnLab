@@ -1,10 +1,8 @@
-from django.shortcuts import render
-
-# Create your views here.
 from rest_framework import viewsets, filters, status
 from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
-from rest_framework.decorators import action
+from rest_framework.decorators import action, api_view, permission_classes
+from rest_framework.pagination import PageNumberPagination
 from django_filters.rest_framework import DjangoFilterBackend
 from .models import Post, Comment
 from .serializers import (
@@ -72,3 +70,23 @@ class CommentViewSet(viewsets.ModelViewSet):
         if post_id:
             queryset = queryset.filter(post_id=post_id)
         return queryset
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def user_feed(request):
+    """
+    Get posts from users that the current user follows
+    """
+    # Get users that the current user follows
+    following_users = request.user.following.all()
+    
+    # Get posts from followed users
+    feed_posts = Post.objects.filter(author__in=following_users).order_by('-created_at')
+    
+    # Paginate the results
+    paginator = PageNumberPagination()
+    paginator.page_size = 10
+    result_page = paginator.paginate_queryset(feed_posts, request)
+    
+    serializer = PostSerializer(result_page, many=True, context={'request': request})
+    return paginator.get_paginated_response(serializer.data)
